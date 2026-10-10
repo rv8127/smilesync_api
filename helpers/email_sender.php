@@ -22,10 +22,10 @@
  *      (Public key is the same "User ID" already used on the web admin side.)
  */
 
-$_cfg = require __DIR__ . '/config.php';
-define('EMAILJS_SERVICE_ID', $_cfg['emailjs']['service_id']);
-define('EMAILJS_PUBLIC_KEY', $_cfg['emailjs']['public_key']);
-define('EMAILJS_PRIVATE_KEY', $_cfg['emailjs']['private_key']);
+$_cfg = file_exists(__DIR__ . '/config.php') ? require __DIR__ . '/config.php' : [];
+define('EMAILJS_SERVICE_ID',  getenv('EMAILJS_SERVICE_ID')  ?: ($_cfg['emailjs']['service_id']  ?? ''));
+define('EMAILJS_PUBLIC_KEY',  getenv('EMAILJS_PUBLIC_KEY')  ?: ($_cfg['emailjs']['public_key']  ?? ''));
+define('EMAILJS_PRIVATE_KEY', getenv('EMAILJS_PRIVATE_KEY') ?: ($_cfg['emailjs']['private_key'] ?? ''));
 /**
  * Sends an email via EmailJS's REST API.
  *
