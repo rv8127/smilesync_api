@@ -544,15 +544,15 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost/smilesync_api"
+      "value": "https://smilesync-api-7udu.onrender.com"
     },
     {
       "key": "clinicCode",
-      "value": "SAMPLE01"
+      "value": "ALCADENT01"
     },
     {
       "key": "patientId",
-      "value": "1"
+      "value": "16"
     },
     {
       "key": "dentistId",
@@ -568,27 +568,27 @@
     },
     {
       "key": "adminEmail",
-      "value": ""
+      "value": "smilesync.team@gmail.com"
     },
     {
       "key": "adminPassword",
-      "value": ""
+      "value": "sm1le726!@#"
     },
     {
       "key": "staffEmail",
-      "value": ""
+      "value": "alc200164@gmail.com"
     },
     {
       "key": "staffPassword",
-      "value": ""
+      "value": "alcaDent123!@"
     },
     {
       "key": "patientEmail",
-      "value": ""
+      "value": "gabalcasid07@gmail.com"
     },
     {
       "key": "patientPassword",
-      "value": ""
+      "value": "gabriel8127"
     }
   ]
 }
