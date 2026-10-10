@@ -1,0 +1,594 @@
+{
+  "info": {
+    "_postman_id": "76ae1406-d4bc-4b72-a3ef-c4debc9cee86",
+    "name": "SmileSync API",
+    "description": "Requests for the SmileSync PHP API. Open the collection's Variables tab and fill in the CURRENT value (not the Initial value) for adminEmail, adminPassword, staffEmail, staffPassword, patientEmail, patientPassword, and clinicCode. Current values stay on your computer and are not exported. Log in before calling protected endpoints; Postman keeps the session cookie automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57822541",
+    "_collection_link": "https://go.postman.co/collection/57822541-76ae1406-d4bc-4b72-a3ef-c4debc9cee86?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "UC-01 Register Clinic",
+      "item": [
+        {
+          "name": "System Admin login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/login.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "login.php"
+              ]
+            },
+            "description": "Signs in the System Admin. Required before registering a clinic."
+          },
+          "response": []
+        },
+        {
+          "name": "Register clinic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sample Dental Clinic\",\n  \"code\": \"SAMPLE01\",\n  \"email\": \"clinic@example.com\",\n  \"phone\": \"09123456789\",\n  \"address\": \"Iloilo City\",\n  \"openingTime\": \"08:00\",\n  \"closingTime\": \"17:00\",\n  \"tier\": \"basic\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/add_clinic.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "add_clinic.php"
+              ]
+            },
+            "description": "UC-01. Registers a new clinic under the signed-in System Admin. Rejects a clinic code that is already used. tier is 'basic' or 'pro'."
+          },
+          "response": []
+        },
+        {
+          "name": "Get clinics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/get_clinics.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "get_clinics.php"
+              ]
+            },
+            "description": "Lists registered clinics."
+          },
+          "response": []
+        }
+      ],
+      "description": "System Admin registers a clinic."
+    },
+    {
+      "name": "Clinic Staff Account",
+      "item": [
+        {
+          "name": "Create clinic staff account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clinicCode\": \"{{clinicCode}}\",\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register.php"
+              ]
+            },
+            "description": "The clinic creates its shared login using the clinic code issued by the System Admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Clinic staff login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login.php"
+              ]
+            },
+            "description": "Signs in the clinic staff. Run this before the UC-02 and UC-03 requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "UC-02 Book Appointment",
+      "item": [
+        {
+          "name": "List patients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/get_patients.php?clinicCode={{clinicCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "get_patients.php"
+              ],
+              "query": [
+                {
+                  "key": "clinicCode",
+                  "value": "{{clinicCode}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List dentists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dentists/get_dentists.php?clinicCode={{clinicCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dentists",
+                "get_dentists.php"
+              ],
+              "query": [
+                {
+                  "key": "clinicCode",
+                  "value": "{{clinicCode}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/services/get_services.php?clinicCode={{clinicCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "services",
+                "get_services.php"
+              ],
+              "query": [
+                {
+                  "key": "clinicCode",
+                  "value": "{{clinicCode}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Book appointment (clinic web admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clinicCode\": \"{{clinicCode}}\",\n  \"patientId\": 1,\n  \"dentistId\": 1,\n  \"serviceId\": 1,\n  \"date\": \"2026-10-20\",\n  \"time\": \"09:00\",\n  \"notes\": \"Sample booking\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/add_appointment.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "add_appointment.php"
+              ]
+            },
+            "description": "UC-02. Staff books an appointment. Checks that the slot is available; status defaults to pending."
+          },
+          "response": []
+        },
+        {
+          "name": "Book appointment (patient app)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clinicCode\": \"{{clinicCode}}\",\n  \"patientId\": 1,\n  \"dentistId\": 1,\n  \"serviceId\": 1,\n  \"date\": \"2026-10-21\",\n  \"time\": \"10:00\",\n  \"notes\": \"Booked from the app\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/book_appointment.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "book_appointment.php"
+              ]
+            },
+            "description": "UC-02. Patient books through the mobile app. Same availability check."
+          },
+          "response": []
+        }
+      ],
+      "description": "Appointments can be booked by staff in the web admin or by the patient in the mobile app."
+    },
+    {
+      "name": "UC-03 Complete Appointment",
+      "item": [
+        {
+          "name": "List appointments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/get_appointments.php?clinicCode={{clinicCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "get_appointments.php"
+              ],
+              "query": [
+                {
+                  "key": "clinicCode",
+                  "value": "{{clinicCode}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentId\": 1,\n  \"status\": \"completed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/update_appointment_status.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "update_appointment_status.php"
+              ]
+            },
+            "description": "UC-03. Marks the appointment as completed and automatically creates the treatment record."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel appointment (alternative)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentId\": 1,\n  \"status\": \"cancelled\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/update_appointment_status.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "appointments",
+                "update_appointment_status.php"
+              ]
+            },
+            "description": "Alternative flow: cancels instead. No treatment record is created."
+          },
+          "response": []
+        },
+        {
+          "name": "Get treatment history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/get_treatment_history.php?patientId={{patientId}}&clinicCode={{clinicCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "get_treatment_history.php"
+              ],
+              "query": [
+                {
+                  "key": "patientId",
+                  "value": "{{patientId}}"
+                },
+                {
+                  "key": "clinicCode",
+                  "value": "{{clinicCode}}"
+                }
+              ]
+            },
+            "description": "Shows the new treatment record in the patient's history."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Patients (setup and patient app)",
+      "item": [
+        {
+          "name": "Add patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clinicCode\": \"{{clinicCode}}\",\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Dela Cruz\",\n  \"contactEmail\": \"juan@example.com\",\n  \"contactNumber\": \"09123456789\",\n  \"address\": \"Iloilo City\",\n  \"birthdate\": \"2000-01-15\",\n  \"gender\": \"Male\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/add_patient.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "add_patient.php"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Patient app register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clinicCode\": \"{{clinicCode}}\",\n  \"contactEmail\": \"juan@example.com\",\n  \"loginEmail\": \"{{patientEmail}}\",\n  \"password\": \"{{patientPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/register.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "register.php"
+              ]
+            },
+            "description": "Links a patient's app account to the record the clinic created."
+          },
+          "response": []
+        },
+        {
+          "name": "Patient app login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{patientEmail}}\",\n  \"password\": \"{{patientPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/login.php",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "patients",
+                "login.php"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/smilesync_api"
+    },
+    {
+      "key": "clinicCode",
+      "value": "SAMPLE01"
+    },
+    {
+      "key": "patientId",
+      "value": "1"
+    },
+    {
+      "key": "dentistId",
+      "value": "1"
+    },
+    {
+      "key": "serviceId",
+      "value": "1"
+    },
+    {
+      "key": "appointmentId",
+      "value": "1"
+    },
+    {
+      "key": "adminEmail",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "staffEmail",
+      "value": ""
+    },
+    {
+      "key": "staffPassword",
+      "value": ""
+    },
+    {
+      "key": "patientEmail",
+      "value": ""
+    },
+    {
+      "key": "patientPassword",
+      "value": ""
+    }
+  ]
+}
