@@ -16,7 +16,7 @@ $conn = getConnection();
 
 $result = pg_query_params($conn,
     "SELECT pa.patient_account_id, pa.password_hash, pa.account_status,
-            p.patient_id, p.first_name, p.last_name, p.clinic_id,
+            p.patient_id, p.first_name, p.last_name, p.clinic_id, p.is_archived,
             c.clinic_code, c.clinic_name, c.status AS clinic_status, c.tier
      FROM patient_account pa
      JOIN patient p ON p.patient_id = pa.patient_id
@@ -29,6 +29,11 @@ $account = pg_fetch_assoc($result);
 
 if (!$account || !password_verify($data['password'], $account['password_hash'])) {
     send_error(401, "Invalid email or password");
+}
+
+// Archived by the clinic (finished treatment, no longer coming back, etc.) -- no more access.
+if ($account['is_archived'] === 't' || $account['is_archived'] === true) {
+    send_error(403, "Your account has been archived by the clinic, so you can no longer access this clinic in the app.", ["reason" => "patient_archived"]);
 }
 
 if ($account['account_status'] !== 'active') {

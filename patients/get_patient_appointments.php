@@ -11,6 +11,12 @@ $clinicCode = require_query_param('clinicCode');
 $conn = getConnection();
 $clinic = require_clinic($conn, $clinicCode);
 
+// The patient app sends app=1 so an archived patient who is still logged in gets blocked here.
+// Staff (web admin) calls don't send it, so staff can still view an archived patient's history.
+if (isset($_GET['app'])) {
+    require_active_patient($conn, (int) $patientId);
+}
+
 // Scoped to this clinic via a.clinic_id -- a patientId from another clinic
 // simply returns no rows rather than that clinic's appointment history.
 $result = pg_query_params($conn,

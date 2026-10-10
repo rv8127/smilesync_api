@@ -30,7 +30,9 @@ $result = pg_query_params($conn,
 fail_on_db_error($result, 'auth/forgot_password: lookup', $conn);
 $account = pg_fetch_assoc($result);
 
-$response = ["codeSent" => false];
+// "registered" lets the web admin flag an email that isn't an official SmileSync clinic account
+// right away, instead of pretending a code might have been sent.
+$response = ["codeSent" => false, "registered" => (bool) $account];
 
 if ($account && $account['account_status'] === 'active' && $account['clinic_status'] === 'active') {
     $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);

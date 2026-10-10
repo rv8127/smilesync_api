@@ -37,6 +37,7 @@ if (!$appt) {
 }
 
 require_clinic_active_by_id($conn, (int) $appt['clinic_id']);
+require_active_patient($conn, (int) $data['patientId']); // archived patients can't change appointments
 
 if ($appt['status'] !== 'pending' && $appt['status'] !== 'confirmed') {
     send_error(422, "This appointment can no longer be rescheduled", ["reason" => "invalid_state", "currentStatus" => $appt['status']]);

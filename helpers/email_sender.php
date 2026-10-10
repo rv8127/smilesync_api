@@ -22,10 +22,10 @@
  *      (Public key is the same "User ID" already used on the web admin side.)
  */
 
-const EMAILJS_SERVICE_ID  = 'service_a5w7glg';       // same Gmail service as the staff flow
-const EMAILJS_PUBLIC_KEY  = 'cy_C4WmAMZ0qSfWWo';  // = "User ID" in EmailJS dashboard
-const EMAILJS_PRIVATE_KEY = 'jOts6s2pOxyYP2qACmt2-'; // Account > API Keys > Private Key
-
+$_cfg = require __DIR__ . '/config.php';
+define('EMAILJS_SERVICE_ID', $_cfg['emailjs']['service_id']);
+define('EMAILJS_PUBLIC_KEY', $_cfg['emailjs']['public_key']);
+define('EMAILJS_PRIVATE_KEY', $_cfg['emailjs']['private_key']);
 /**
  * Sends an email via EmailJS's REST API.
  *
