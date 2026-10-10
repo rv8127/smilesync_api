@@ -145,4 +145,3 @@ http://localhost/smilesync_api/
 ## Notes
 
 - The API and database run locally; there is no cloud deployment.
-- Do not commit `helpers/config.php` or any real passwords or API keys.
