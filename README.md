@@ -22,8 +22,8 @@ It helps dental clinics manage patients, dentists, services, schedules, and appo
 
 | Layer | Technology |
 | --- | --- |
-| Backend | PHP (plain PHP, no framework) |
-| Web server | Apache (XAMPP) |
+| Backend | PHP |
+| Web server | Apache (Docker container on Render) |
 | Database | PostgreSQL, managed with pgAdmin 4 |
 | Data format | JSON over HTTP |
 | Email (password reset) | EmailJS |
