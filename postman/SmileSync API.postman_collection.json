@@ -548,11 +548,11 @@
     },
     {
       "key": "clinicCode",
-      "value": "ALCADENT01"
+      "value": ""
     },
     {
       "key": "patientId",
-      "value": "16"
+      "value": "1"
     },
     {
       "key": "dentistId",
@@ -568,27 +568,27 @@
     },
     {
       "key": "adminEmail",
-      "value": "smilesync.team@gmail.com"
+      "value": ""
     },
     {
       "key": "adminPassword",
-      "value": "sm1le726!@#"
+      "value": ""
     },
     {
       "key": "staffEmail",
-      "value": "alc200164@gmail.com"
+      "value": ""
     },
     {
       "key": "staffPassword",
-      "value": "alcaDent123!@"
+      "value": ""
     },
     {
       "key": "patientEmail",
-      "value": "gabalcasid07@gmail.com"
+      "value": ""
     },
     {
       "key": "patientPassword",
-      "value": "gabriel8127"
+      "value": ""
     }
   ]
 }
