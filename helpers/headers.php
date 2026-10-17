@@ -5,6 +5,15 @@
 // the frontend from a different host/port than the API. Reflecting the
 // actual request origin (instead of '*') keeps this open to any origin
 // during dev while still allowing credentials.
+
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+if ($isHttps) {
+    ini_set('session.cookie_samesite', 'None');
+    ini_set('session.cookie_secure', '1');
+}
+
+
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 header("Access-Control-Allow-Origin: $origin");
 header('Access-Control-Allow-Credentials: true');

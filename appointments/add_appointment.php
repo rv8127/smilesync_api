@@ -33,7 +33,8 @@ $insertResult = pg_query_params($conn,
         $data['serviceId'],
         $data['date'],
         $data['time'],
-        $data['status'] ?? 'pending',
+        // Never 'pending': availability is already validated above, so a new appointment is confirmed.
+        (($data['status'] ?? 'confirmed') === 'pending') ? 'confirmed' : ($data['status'] ?? 'confirmed'),
         $data['notes'] ?? null
     )
 );

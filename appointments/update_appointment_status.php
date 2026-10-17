@@ -10,7 +10,14 @@ $data = get_json_body();
 $data = validate_or_fail($data, [
     'appointmentId' => ['required' => true, 'type' => 'int'],
     'status'        => ['required' => true, 'type' => 'string'],
+    'note'          => ['type' => 'string'], // optional dentist note, only used when completing
 ]);
+
+$note = $data['note'] ?? null;
+if ($note === '') { $note = null; }
+if ($note !== null && mb_strlen($note) > 500) {
+    send_error(422, "Validation failed", ['note' => 'must be 500 characters or fewer']);
+}
 
 $conn = getConnection();
 
@@ -25,6 +32,8 @@ if (!$appt) {
     send_error(404, "Appointment not found");
 }
 
+if ($data['status'] === 'pending') { $data['status'] = 'confirmed'; } // no 'pending' status: availability is validated when booking
+
 $updateResult = pg_query_params($conn,
     "UPDATE appointment SET status = $1 WHERE appointment_id = $2",
     array($data['status'], $data['appointmentId'])
@@ -32,6 +41,7 @@ $updateResult = pg_query_params($conn,
 fail_on_db_error($updateResult, 'appointments/update_appointment_status: update', $conn);
 
 $treatmentCreated = false;
+$noteSaved = false;
 
 if ($data['status'] === 'completed') {
     $dupCheck = pg_query_params($conn,
@@ -45,14 +55,31 @@ if ($data['status'] === 'completed') {
         $treatmentInsert = pg_query_params($conn,
             "INSERT INTO treatment_record (patient_id, dentist_id, service_id, record_date, notes)
              VALUES ($1, $2, $3, $4, $5)",
-            array($appt['patient_id'], $appt['dentist_id'], $appt['service_id'], $appt['appointment_date'], 'Auto-logged from completed appointment.')
+            array($appt['patient_id'], $appt['dentist_id'], $appt['service_id'], $appt['appointment_date'], $note ?? 'Auto-logged from completed appointment.')
         );
         fail_on_db_error($treatmentInsert, 'appointments/update_appointment_status: treatment insert', $conn);
         $treatmentCreated = true;
+        $noteSaved = ($note !== null);
+    } elseif ($note !== null) {
+        // A treatment record for this visit already exists: replace the auto-log placeholder with
+        // the dentist's note, or append to whatever was already written there.
+        $existingRecord = pg_fetch_assoc($dupCheck);
+        $noteUpdate = pg_query_params($conn,
+            "UPDATE treatment_record
+             SET notes = CASE
+                 WHEN notes IS NULL OR notes = '' OR notes = 'Auto-logged from completed appointment.' THEN $1::text
+                 ELSE LEFT(notes || ' | ' || $1::text, 500)
+             END
+             WHERE treatment_record_id = $2",
+            array($note, $existingRecord['treatment_record_id'])
+        );
+        fail_on_db_error($noteUpdate, 'appointments/update_appointment_status: note update', $conn);
+        $noteSaved = true;
     }
 }
 
 send_success([
     "message" => "Appointment marked as {$data['status']}",
-    "treatmentRecordCreated" => $treatmentCreated
+    "treatmentRecordCreated" => $treatmentCreated,
+    "noteSaved" => $noteSaved
 ]);

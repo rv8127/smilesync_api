@@ -23,6 +23,8 @@ $data = validate_or_fail($data, [
     'openingTime' => ['type' => 'time'],
     'closingTime' => ['type' => 'time'],
     'tier'        => ['type' => 'string'],
+    'subscriptionStart' => ['type' => 'date'],
+    'subscriptionEnd'   => ['type' => 'date'],
 ]);
 
 $status = $data['status'] ?? 'active';
@@ -35,6 +37,11 @@ if (!in_array($tier, ['basic', 'pro'])) {
     send_error(422, "Validation failed", ["tier" => "must be 'basic' or 'pro'"]);
 }
 
+// Subscriptions are monthly: the due date is never typed in, it's always the
+// start date + 30 days, worked out here so it can't drift from the start date.
+$subStart = !empty($data['subscriptionStart']) ? $data['subscriptionStart'] : null;
+$subEnd   = $subStart ? (new DateTime($subStart))->modify('+30 days')->format('Y-m-d') : null;
+
 $conn = getConnection();
 
 $dupResult = pg_query_params($conn, "SELECT clinic_id FROM clinic WHERE clinic_code = $1", array($data['code']));
@@ -43,9 +50,19 @@ if (pg_num_rows($dupResult) > 0) {
     send_error(422, "A clinic with this code already exists", ["code" => "already in use"]);
 }
 
+// Each clinic needs its own email (it receives that clinic's welcome/reminder emails), so the same
+// address can't be used for two clinics. Compared case-insensitively; blank emails are skipped.
+if (!empty($data['email'])) {
+    $emailDup = pg_query_params($conn, "SELECT clinic_id FROM clinic WHERE LOWER(contact_email) = LOWER($1)", array($data['email']));
+    fail_on_db_error($emailDup, 'admin/add_clinic: email duplicate check', $conn);
+    if (pg_num_rows($emailDup) > 0) {
+        send_error(422, "A clinic with this email already exists", ["email" => "already in use"]);
+    }
+}
+
 $insertResult = pg_query_params($conn,
-    "INSERT INTO clinic (clinic_name, clinic_code, address, contact_email, contact_number, status, admin_id, opening_time, closing_time, tier)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING clinic_id",
+    "INSERT INTO clinic (clinic_name, clinic_code, address, contact_email, contact_number, status, admin_id, opening_time, closing_time, tier, subscription_start, subscription_end)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING clinic_id",
     array(
         $data['name'],
         $data['code'],
@@ -56,7 +73,9 @@ $insertResult = pg_query_params($conn,
         $adminId,
         $data['openingTime'] ?? null,
         $data['closingTime'] ?? null,
-        $tier
+        $tier,
+        $subStart,
+        $subEnd
     )
 );
 fail_on_db_error($insertResult, 'admin/add_clinic: insert', $conn);

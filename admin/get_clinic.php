@@ -13,7 +13,9 @@ $clinicId = require_query_param('id');
 $conn = getConnection();
 $result = pg_query_params($conn,
     "SELECT clinic_id, clinic_name, clinic_code, address, contact_email, contact_number, status,
-            opening_time, closing_time, tier
+            opening_time, closing_time, tier, subscription_start, subscription_end,
+            (subscription_end - (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::date) AS days_left,
+            (SELECT COUNT(*) FROM clinic_payment WHERE clinic_payment.clinic_id = clinic.clinic_id) AS payment_count
      FROM clinic WHERE clinic_id = $1",
     array($clinicId)
 );

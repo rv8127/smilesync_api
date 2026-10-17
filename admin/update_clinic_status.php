@@ -23,11 +23,23 @@ if (!in_array($data['status'], ['active', 'inactive'])) {
 
 $conn = getConnection();
 
-$clinicResult = pg_query_params($conn, "SELECT clinic_name FROM clinic WHERE clinic_id = $1", array($data['id']));
+$clinicResult = pg_query_params($conn,
+    "SELECT clinic_name,
+            (subscription_end - (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::date) AS days_left
+     FROM clinic WHERE clinic_id = $1",
+    array($data['id'])
+);
 fail_on_db_error($clinicResult, 'admin/update_clinic_status: lookup', $conn);
 $clinic = pg_fetch_assoc($clinicResult);
 if (!$clinic) {
     send_error(404, "Clinic not found");
+}
+
+// An expired subscription can't be reactivated -- not even by the System Admin --
+// until a payment is recorded (record_payment.php starts a new 30-day term).
+if ($data['status'] === 'active' && $clinic['days_left'] !== null && (int) $clinic['days_left'] < 0) {
+    send_error(422, "This clinic's subscription has expired. Record its payment first (Clinic paid?) before reactivating.",
+        ["reason" => "subscription_expired"]);
 }
 
 $updateResult = pg_query_params($conn, "UPDATE clinic SET status = $1 WHERE clinic_id = $2",

@@ -38,6 +38,7 @@ $serviceId = $data['serviceId'] ?? $existing['service_id'];
 $date      = $data['date']      ?? $existing['appointment_date'];
 $time      = $data['time']      ?? $existing['appointment_time'];
 $status    = $data['status']    ?? $existing['status'];
+if ($status === 'pending') { $status = 'confirmed'; } // no 'pending' status: availability is validated when booking
 $notes     = $data['notes']     ?? $existing['notes'];
 
 // Only re-check availability if the actual scheduling facts are changing --

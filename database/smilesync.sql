@@ -176,6 +176,9 @@ CREATE TABLE public.clinic (
     status character varying(20) DEFAULT 'active'::character varying NOT NULL,
     admin_id integer NOT NULL,
     tier character varying(20) DEFAULT 'basic'::character varying NOT NULL,
+    subscription_start date,
+    subscription_end date,
+    reminder_sent_for date,
     CONSTRAINT clinic_status_check CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying])::text[]))),
     CONSTRAINT clinic_tier_check CHECK (((tier)::text = ANY ((ARRAY['basic'::character varying, 'pro'::character varying])::text[])))
 );
@@ -506,7 +509,9 @@ CREATE TABLE public.system_announcement (
     type character varying(30) DEFAULT 'info'::character varying NOT NULL,
     announcement_date date DEFAULT CURRENT_DATE NOT NULL,
     expires_on date,
-    created_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    audience character varying(20) DEFAULT 'patient_app'::character varying NOT NULL,
+    CONSTRAINT system_announcement_audience_check CHECK (((audience)::text = ANY ((ARRAY['patient_app'::character varying, 'web_admin'::character varying, 'both'::character varying])::text[])))
 );
 
 
@@ -1013,6 +1018,29 @@ ALTER TABLE ONLY public.treatment_record
 
 ALTER TABLE ONLY public.treatment_record
     ADD CONSTRAINT treatment_record_service_id_fkey FOREIGN KEY (service_id) REFERENCES public.service(service_id);
+
+
+--
+-- Name: clinic_payment; Type: TABLE; Schema: public; Owner: -
+-- One row per subscription payment a clinic makes to SmileSync (System Admin > Clinics > Payments).
+--
+
+CREATE TABLE public.clinic_payment (
+    payment_id serial PRIMARY KEY,
+    clinic_id integer NOT NULL REFERENCES public.clinic(clinic_id),
+    amount numeric(10,2) NOT NULL CHECK (amount > 0),
+    paid_on date NOT NULL,
+    period_start date NOT NULL,
+    period_end date NOT NULL,
+    method character varying(20) DEFAULT 'cash'::character varying NOT NULL
+        CHECK (method IN ('cash', 'gcash', 'bank_transfer', 'other')),
+    reference_no character varying(100),
+    note text,
+    recorded_by character varying(255),
+    created_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+CREATE INDEX clinic_payment_clinic_id_idx ON public.clinic_payment (clinic_id, paid_on DESC);
 
 
 -- Completed on 2026-10-10 18:43:04

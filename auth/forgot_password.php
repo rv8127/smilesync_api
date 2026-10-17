@@ -50,6 +50,7 @@ if ($account && $account['account_status'] === 'active' && $account['clinic_stat
     // note in the file header comment above.
     $response = [
         "codeSent" => true,
+        "registered" => true,
         "code" => $code,
         "clinicName" => $account['clinic_name'],
     ];
