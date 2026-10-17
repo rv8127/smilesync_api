@@ -91,6 +91,8 @@ psql -U smilesync_team -d smilesync_database -f database/smilesync.sql
 
 Credentials are not stored in the repository. Copy the sample file and fill in your own values:
 
+Open the collection’s Variables tab and enter the credentials listed here
+
 ```bash
 cd smilesync_api/helpers
 copy config.example.php config.php
