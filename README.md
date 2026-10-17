@@ -22,8 +22,8 @@ It helps dental clinics manage patients, dentists, services, schedules, and appo
 
 | Layer | Technology |
 | --- | --- |
-| Backend | PHP (plain PHP, no framework) |
-| Web server | Apache (XAMPP) |
+| Backend | PHP |
+| Web server | Apache (Docker container on Render) |
 | Database | PostgreSQL, managed with pgAdmin 4 |
 | Data format | JSON over HTTP |
 | Email (password reset) | EmailJS |
@@ -90,6 +90,8 @@ psql -U smilesync_team -d smilesync_database -f database/smilesync.sql
 ### 4. Configure the API
 
 Credentials are not stored in the repository. Copy the sample file and fill in your own values:
+
+Open the collection’s Variables tab and enter the credentials listed here
 
 ```bash
 cd smilesync_api/helpers
